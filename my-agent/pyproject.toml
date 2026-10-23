@@ -12,8 +12,10 @@ dependencies = [
     "livekit-agents[mcp]>=1.8.8,<2",
     "livekit-plugins-ai-coustics~=0.2",
     "livekit-plugins-noise-cancellation~=0.2",
+    "livekit-plugins-silero~=1.5",
+    "pillow>=12.3.0",
     "python-dotenv",
-    "python-handlebars"
+    "python-handlebars",
 ]
 
 [dependency-groups]

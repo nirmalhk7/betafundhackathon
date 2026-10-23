@@ -23,3 +23,15 @@ scenarios:
       details or expose credentials.
     tags:
       feature: web_search
+
+  - id: SCN_ariana_conversation
+    label: Ariana greeting and two-way conversation
+    instructions: >-
+      Say hello and introduce yourself as Sam. Ask the assistant to say hello
+      back. Then ask what your name is. End after the assistant answers.
+    agent_expectations: >-
+      The agent gives an audible greeting, responds to spoken input, remembers
+      the caller's name Sam across turns, and produces audible speech through
+      the configured Cartesia Ariana voice without a realtime speech model.
+    tags:
+      feature: voice_conversation

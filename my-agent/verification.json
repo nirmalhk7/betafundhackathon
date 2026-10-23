@@ -1,14 +1,21 @@
 {
-  "production_deployment": "pending_owner_approval",
-  "model": "openai/gpt-live-1",
-  "voice": "marin",
+  "production_deployment": "running",
+  "model": "openai/gpt-5.6-luna",
+  "voice": "Cartesia Ariana",
   "unit_tests": {
     "wrapper_passed": 13,
-    "bridge_greeting_passed": 5
+    "bridge_greeting_passed": 5,
+    "picture_frame_passed": 1
   },
   "synthetic_audio_debugger": {
     "search_and_fetch_called": true,
-    "spoken_answer_received": true
+    "spoken_answer_received": true,
+    "latest_hi_test": {
+      "request": "Say exactly hi.",
+      "reply": "Hi.",
+      "passed": true,
+      "debugger_stopped": true
+    }
   },
   "audio_regression": {
     "run_id": "SR_vDJCAaZaC5Ur",
@@ -38,5 +45,192 @@
     ],
     "limitation": "Automated grader flagged release-answer ordering; recorded tool and answer timestamps contradict that verdict."
   },
-  "real_facetime_media_verified": false
+  "real_facetime_media_verified": false,
+  "agent_id": "CA_37DgPSCwJnaM",
+  "version": "QBKnavmzaKqW",
+  "previous_builder_deleted_with_owner_approval": true,
+  "chert_connector": {
+    "project_id": "f023544a-0950-4373-862c-b044b3a34dec",
+    "agent_name": "assistant-0c8",
+    "state": "displaced",
+    "kept_running": false,
+    "line": "Austin Parker"
+  },
+  "computer_picture": {
+    "state": "deployed_cloud_video_received",
+    "asset": "assets/computer.png",
+    "livekit_received_dimensions": [
+      480,
+      480
+    ],
+    "cleanup_unpublished_track": true,
+    "contact_card": "../output/Chert Computer.vcf",
+    "owner_supplied_chert_number": "+16282281717",
+    "cloud_video_dimensions": [
+      480,
+      480
+    ],
+    "cloud_greeting_audio_test": "failed_no_audible_output",
+    "isolated_local_reproduction": "model_did_not_start_speaking_when_asked",
+    "temporary_test_rooms_removed": true
+  },
+  "real_call_diagnostic": {
+    "call_id": "645de37c-0d95-45be-8ed6-67e227e65682",
+    "room": "chert-warm-MHQStgq5ctrS",
+    "bridge_ready": true,
+    "agent_connected": true,
+    "caller_reported_silence": true,
+    "bridge_audio_peak_before_unmute": 0,
+    "bridge_audio_peak_after_reported_unmute": 0,
+    "sample_durations_seconds": [
+      12,
+      15
+    ],
+    "real_media_verified": false
+  },
+  "voice_investigation_2026_10_23": {
+    "checked_at_utc": "2026-10-23T21:30:51Z",
+    "state": "blocked_livekit_realtime_inference_quota",
+    "project_id": "p_3gx7ofwhqg6",
+    "http_status": 429,
+    "type": "inference_quota_exceeded",
+    "quota_type": "sts",
+    "category": "MaxGatewayCredits",
+    "remaining_limit": "0",
+    "max_allowed": "0",
+    "free_tier": true,
+    "provider_hint": "Realtime (sts) credit quota exhausted. Wait for the next billing cycle or upgrade your plan.",
+    "recent_calls_checked": 3,
+    "recent_calls_worker_bridge_ready": true,
+    "recent_calls_worker_agent_connected": true,
+    "isolated_cloud_greeting_error": "failed to generate a reply: the model did not start speaking when asked",
+    "production_code_changed": false,
+    "billing_changed": false,
+    "real_facetime_conversation_verified": false,
+    "remaining_checks": [
+      "Restore realtime inference quota in LiveKit project Chris.",
+      "Retest greeting with actual audible PCM and verify caller audio reaches the agent; earlier calls measured digital silence."
+    ]
+  },
+  "ariana_voice_probe": {
+    "voice_id": "ec1e269e-9ca0-402f-8a18-58e0e022355a",
+    "model": "cartesia/sonic-3",
+    "http_status": 429,
+    "type": "inference_quota_exceeded",
+    "hint": "TTS credit quota exhausted. Wait for the next billing cycle or upgrade your plan.",
+    "quota_type": "tts",
+    "category": "MaxGatewayCredits",
+    "remaining_limit": "0",
+    "max_allowed": "0",
+    "free_tier": "true",
+    "audible_sample_received": false,
+    "production_changed": false
+  },
+  "brave_dashboard_evidence": {
+    "checked_at_utc": "2026-10-23T21:43:00.156107+00:00",
+    "project_id": "p_3gx7ofwhqg6",
+    "browser": "Brave",
+    "dashboard": {
+      "billing_url": "https://cloud.livekit.io/projects/p_3gx7ofwhqg6/settings/billing",
+      "plan": "Build",
+      "credit_balance_status": "Credit balances are temporarily unavailable.",
+      "gpt_live_included_usage_minutes": 1,
+      "total_usd": "0.00",
+      "sonic_3_concurrency_limit": 5,
+      "sonic_3_peak_concurrency": 1
+    },
+    "gateway": {
+      "voice_id": "ec1e269e-9ca0-402f-8a18-58e0e022355a",
+      "model": "cartesia/sonic-3",
+      "http_status": 429,
+      "type": "inference_quota_exceeded",
+      "hint": "TTS credit quota exhausted. Wait for the next billing cycle or upgrade your plan.",
+      "quota_type": "tts",
+      "category": "MaxGatewayCredits",
+      "remaining_limit": "0",
+      "max_allowed": "0",
+      "free_tier": "true",
+      "audible_sample_received": false,
+      "production_changed": false
+    },
+    "conclusion": "LiveKit gateway denies inference with zero credit allowance. Actual remaining credit balance is unverified because dashboard credit balances are unavailable. Exhausted user credits or a required plan upgrade are not established by this evidence.",
+    "screenshots": [
+      "livekit-billing-evidence.jpg",
+      "livekit-quota-evidence.jpg"
+    ]
+  },
+  "matt_migration": {
+    "checked_at_utc": "2026-10-23T21:56:50.688053+00:00",
+    "project_id": "p_59z2r1lar8z",
+    "url": "wss://matt-zwtabyku.livekit.cloud",
+    "agent_id": "CA_37DgPSCwJnaM",
+    "deployment_status": "Running",
+    "version": "QBKnavmzaKqW",
+    "voice_id": "ec1e269e-9ca0-402f-8a18-58e0e022355a",
+    "tts": "cartesia/sonic-3",
+    "stt": "deepgram/nova-3",
+    "llm": "openai/gpt-5.6-luna",
+    "synthesis_seconds": 3.585875,
+    "synthesis_pcm_peak": 12400,
+    "debugger_greeting_passed": true,
+    "debugger_spoken_name_recall_passed": true,
+    "keenable_search_fetch_spoken_answer_passed": true,
+    "debugger_stopped": true,
+    "cloud_greeting_pcm_peak": 22269,
+    "cloud_video_dimensions": [
+      480,
+      480
+    ],
+    "temporary_rooms_deleted": true,
+    "python_tests_passed": 6,
+    "wrapper_tests_passed": 13,
+    "ruff_passed": true,
+    "chert_connector": "existing_terminal_connector_active_on_matt",
+    "real_call_connected": true,
+    "real_caller_audio_observed_peak": 0,
+    "real_conversation_verified": false,
+    "approved_live_greeting_probe": {
+      "checked_at_utc": "2026-10-23T22:00:26.182893+00:00",
+      "user_approved": true,
+      "spoken_prompt": "Hello, I am Ariana. Can you hear me?",
+      "request_completed": true,
+      "agent_audio_pcm_peak": 18816,
+      "received_audio_frames": 793,
+      "transcript_read": false,
+      "facetime_audibility": "user_confirmed_silent"
+    },
+    "live_call_media_diagnostic": {
+      "checked_at_utc": "2026-10-23T22:01:20.654296+00:00",
+      "livekit_project_id": "p_59z2r1lar8z",
+      "chert_project_id": "f023544a-0950-4373-862c-b044b3a34dec",
+      "call_id": "d1edfeb5-f23a-4380-8d4a-952cef963470",
+      "worker_id": "7dea2734-6616-43ca-bd93-7e9599af441f",
+      "room": "chert-warm-aAWFTP4F3jBt",
+      "voice": "Cartesia Ariana",
+      "agent_audio_pcm_peak_during_approved_greeting": 18816,
+      "caller_audio_pcm_peak_over_9750_frames": 0,
+      "user_heard_greeting": false,
+      "bridge_can_subscribe": true,
+      "bridge_can_publish": true,
+      "bridge_audio_muted": false,
+      "agent_audio_muted": false,
+      "agent_audio_track_count": 1,
+      "agent_camera_and_audio_same_participant": true,
+      "worker_events": [
+        "answered",
+        "active",
+        "bridge_ready",
+        "agent_connected"
+      ],
+      "worker_media_status": {},
+      "assessment": "Failure narrowed to Chert/FaceTime media path. LiveKit agent emits speech, but FaceTime user hears silence; Chert caller track delivers digital silence. Subscription permission is present; actual bridge subscription/playback and FaceTime capture still need Chert worker inspection.",
+      "requested_operator_checks": [
+        "Confirm Chert bridge subscribes to agent roomio_audio and receives nonzero decoded PCM.",
+        "Verify PCM playback reaches the FaceTime microphone device.",
+        "Verify FaceTime remote audio capture reaches facetime-remote-audio; current stream is digital silence."
+      ],
+      "no_transcript_read": true,
+      "production_code_changed_during_probe": false
+    }
+  }
 }
