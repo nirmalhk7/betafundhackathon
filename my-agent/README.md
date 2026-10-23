@@ -6,8 +6,16 @@ The agent is a FaceTime practice coach for pitches, job interviews, and
 presentations. Its persona lives in `src/coach.py`: it asks what the caller is
 rehearsing, researches the topic with Keenable (one search, at most one fetch),
 listens without interrupting, and after "I'm done" gives three strengths, three
-improvements, and one improved line. It comments on body language only when
-visual observations are supplied; `gpt-live-1` itself is audio-only.
+improvements, and one improved line. `gpt-live-1` is audio-only, so body language comes from `src/vision.py`: it
+subscribes to the caller's camera, runs MediaPipe face and gesture models
+(`models/*.task`) locally on about five frames per second, and the coach reads a
+plain-English summary (eye contact, expression, head movement, hand gestures)
+through the `get_body_language` tool right before feedback. Audio-only calls
+skip body language. Try the tracker on your webcam without LiveKit:
+
+```sh
+uv run --python 3.13 python scripts/vision_check.py --seconds 20
+```
 
 ### Running your own copy locally
 

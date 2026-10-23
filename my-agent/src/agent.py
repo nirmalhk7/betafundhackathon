@@ -1,7 +1,10 @@
+import asyncio
+import contextlib
 import logging
 import os
 
 from dotenv import load_dotenv
+from livekit import rtc
 from livekit.agents import (
     Agent,
     AgentServer,
@@ -9,6 +12,7 @@ from livekit.agents import (
     AutoSubscribe,
     JobContext,
     cli,
+    function_tool,
     inference,
     mcp,
     room_io,
@@ -19,6 +23,7 @@ from livekit.plugins import (
 
 from chert_bridge import greet_on_bridge_ready
 from coach import COACH_INSTRUCTIONS, GREETING, agent_name
+from vision import VisionTracker
 
 logger = logging.getLogger("agent-coach")
 
@@ -73,12 +78,30 @@ def keenable_toolset() -> mcp.MCPToolset:
 
 
 class CoachAgent(Agent):
-    def __init__(self, tools: list, *, greet_on_entry: bool = True) -> None:
+    def __init__(
+        self,
+        tools: list,
+        *,
+        vision: VisionTracker | None = None,
+        greet_on_entry: bool = True,
+    ) -> None:
         self._greet_on_entry = greet_on_entry
+        self._vision = vision
         super().__init__(
             instructions=COACH_INSTRUCTIONS + VOICE_SEARCH_POLICY,
             tools=tools,
         )
+
+    @function_tool
+    async def get_body_language(self) -> str:
+        """Get camera observations of the caller's body language since the last
+        check: eye contact, expression, head movement, and hand gestures. Call it
+        once right before giving feedback. Only describe what it reports."""
+        if self._vision is None:
+            return "No camera is connected. Do not comment on body language."
+        observations = self._vision.summary()
+        logger.info("body language: %s", observations)
+        return observations
 
     async def on_enter(self):
         if self._greet_on_entry:
@@ -86,6 +109,28 @@ class CoachAgent(Agent):
                 instructions=GREETING,
                 allow_interruptions=True,
             )
+
+
+async def wait_for_microphone(
+    room: rtc.Room, participant: rtc.RemoteParticipant, timeout: float = 30
+) -> None:
+    """Browser rooms: greeting before the caller's mic is live gets lost."""
+    live = asyncio.Event()
+
+    def check(*_args: object) -> None:
+        if any(
+            pub.source == rtc.TrackSource.SOURCE_MICROPHONE
+            for pub in participant.track_publications.values()
+        ):
+            live.set()
+
+    room.on("track_published", check)
+    try:
+        check()
+        with contextlib.suppress(asyncio.TimeoutError):
+            await asyncio.wait_for(live.wait(), timeout)
+    finally:
+        room.off("track_published", check)
 
 
 server = AgentServer()
@@ -105,6 +150,18 @@ async def entrypoint(ctx: JobContext):
 
     if chert_call:
         caller = await ctx.wait_for_participant()
+    elif not ctx.is_fake_job():
+        await wait_for_microphone(ctx.room, await ctx.wait_for_participant())
+
+    vision = None
+    try:
+        vision = VisionTracker(ctx.room, caller.identity if caller else None)
+        vision.start()
+        ctx.add_shutdown_callback(vision.aclose)
+    except Exception:
+        # Console mode has no real room; the coach just skips body language.
+        logger.warning("camera tracking unavailable", exc_info=True)
+        vision = None
 
     session = AgentSession(
         llm=inference.DuplexModel(
@@ -116,7 +173,7 @@ async def entrypoint(ctx: JobContext):
     ctx.add_shutdown_callback(session.aclose)
 
     await session.start(
-        agent=CoachAgent([tools], greet_on_entry=not chert_call),
+        agent=CoachAgent([tools], vision=vision, greet_on_entry=not chert_call),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             **({"participant_identity": caller.identity} if caller else {}),

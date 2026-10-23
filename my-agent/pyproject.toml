@@ -12,8 +12,9 @@ dependencies = [
     "livekit-agents[mcp]>=1.8.8,<2",
     "livekit-plugins-ai-coustics~=0.2",
     "livekit-plugins-noise-cancellation~=0.2",
+    "mediapipe>=1.1.1",
     "python-dotenv",
-    "python-handlebars"
+    "python-handlebars",
 ]
 
 [dependency-groups]
