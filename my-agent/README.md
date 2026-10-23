@@ -1,5 +1,66 @@
 # LiveKit Agent
 
+## Chert integration in this project
+
+This is the exported source of your existing Builder agent, not a generic new
+persona. It retains dispatch name `assistant-0c8`, model `openai/gpt-live-1`,
+Marin voice, original instructions, and AI-coustics audio enhancement.
+`livekit.toml` targets existing agent `CA_HJ6N6GNSyzsp` in LiveKit project Chris.
+
+Changes added here:
+
+- Chert rooms join promptly and wait for a caller before creating the paid model session.
+- Greeting waits for room metadata `chert_bridge_ready: true`; participant join
+  alone cannot trigger it. Duplicate signals and caller disconnects are handled.
+- Audio input is bound to the caller; room deletion stays with Chert.
+- Keenable MCP provides `search_web_pages` and `fetch_page_content`. Voice
+  instructions delegate uncertain/current facts; backend instructions require
+  source verification and honest failure reporting.
+
+Model usage is billed through LiveKit Inference using LiveKit credentials;
+this configuration does not require a separate `OPENAI_API_KEY`. GPT-Live is
+audio-only: use `lk agent debugger start --audio` and audio scenarios, not a
+text-only debugger. Synthetic audio tests do not establish real FaceTime media.
+
+### Credentials and checks
+
+For local work, `.env.local` links to the parent project's private file. It must
+contain `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and
+`KEENABLE_API_KEY`. Keep its mode `0600` and never commit it. The separately
+ignored `.env.keenable` contains only the secret needed for the deployment update.
+Cloud automatically supplies the deployed agent's LiveKit project credentials.
+
+```sh
+uv sync --frozen
+PYTHONPATH=src uv run pytest -q
+uv run ruff check src tests
+```
+
+### Deployment and calling
+
+Production deployment requires owner approval. Use the existing agent ID; do
+not create a competing deployment with the same dispatch name:
+
+```sh
+lk agent deploy --id CA_HJ6N6GNSyzsp --secrets-file .env.keenable
+```
+
+After moving production to this source, further Builder deployments can overwrite
+the custom Chert greeting hook. Maintain this exported project as the source of truth.
+
+The Chert connector separately uses pinned `@trychert/facetime@0.1.0-beta.10`,
+approved CLI login, project `f023544a-0950-4373-862c-b044b3a34dec`, and the same
+LiveKit URL and dispatch name. Coordinate with the existing connector holder;
+do not use `--takeover` without explicit authorization. Enable calls only after
+deployment readiness and the intended handoff, then wait for `agent_warm`.
+
+Chert's CLI login, FaceTime project API keys, LiveKit credentials, and Keenable
+credentials are separate. No extra project API key or custom webhook is needed
+for the `chert dev` route. Hosting, inference, and searches can incur charges.
+Before any real call, confirm its recipient/purpose and get owner approval.
+Verify two conversations, interruption, hangup, and room cleanup; only the owner
+can confirm real call audio/video.
+
 A voice AI project built with [LiveKit Agents for Python](https://github.com/livekit/agents) and [LiveKit Cloud](https://cloud.livekit.io/). This project is designed to work with coding agents like [Claude Code](https://claude.com/product/claude-code), [Cursor](https://www.cursor.com/), and [Codex](https://openai.com/codex/) — see [Coding agent support](https://docs.livekit.io/intro/coding-agents/) for setup tips.
 
 > [!IMPORTANT]
