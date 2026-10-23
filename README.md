@@ -12,18 +12,17 @@ This integration targets the existing LiveKit Cloud agent in project **Chris**:
 - URL: `wss://chris-1zd6fz6o.livekit.cloud`
 - [Agent Builder](https://cloud.livekit.io/projects/p_3gx7ofwhqg6/agents/builder/ab_qrffng10k9f?tab=conversation&dashboardAgentId=CA_HJ6N6GNSyzsp)
 
-These non-secret identifiers were verified in the dashboard. Deployment showed
-`DEPLOYING` during inspection on October 23, 2026; production readiness has not
-been confirmed. Voice, models, instructions, and tools remain managed by the
-existing Cloud agent. No local voice agent or OpenAI key is required by this
-wrapper in Cloud mode. Any required model credentials belong in the agent's
-existing Cloud configuration.
+Existing Cloud agent status is `Running`. Its exported source, revised for
+Chert greeting timing and Keenable search, is in [my-agent](my-agent/README.md).
+The revised source has not yet replaced production. It preserves model
+`openai/gpt-live-1`, Marin voice, original instructions, and audio enhancement.
+Model access uses LiveKit Inference; no separate OpenAI API key is required.
 
 Incoming FaceTime calls are bridged by Chert into LiveKit rooms, where Chert
 dispatches the named Cloud agent. The agent's dashboard ID and builder ID are
 reference metadata; dispatch uses its name, not either ID. The pinned CLI targets
-the production deployment. Chert project/line selection, credentials, and real
-message/call verification remain pending.
+the production deployment. Project selection, CLI login, line assignment, and
+LiveKit credentials have been verified. Real call media remains unverified.
 
 ## Finish configuration
 
@@ -57,12 +56,12 @@ The requested native CLI setup command for the selected existing project is:
 ./node_modules/.bin/chert doctor --env-file .env.local --project f023544a-0950-4373-862c-b044b3a34dec --json
 ```
 
-Chert setup defaults now select project `f023544a-0950-4373-862c-b044b3a34dec`.
-LiveKit credentials previously passed doctor. Existing CLI sign-in belongs to the
-old project; approve a fresh `chert login` selecting this new existing project.
-Do not create another project, run onboarding, or reset its state. Line assignment
-and agent readiness for the new project remain unchecked pending sign-in.
-No agent/connector is running from this setup yet.
+Chert setup and approved CLI login select project
+`f023544a-0950-4373-862c-b044b3a34dec`. LiveKit credentials passed doctor. Austin
+Parker is assigned. The latest read-only check now reports calls enabled, a
+recent Mac heartbeat, and no session holding the line. Our earlier connector
+stopped cleanly after another session took over. Check again before connecting;
+do not start duplicate connectors or reset onboarding.
 
 ## Required Chert greeting behavior
 
@@ -75,10 +74,9 @@ Before starting this existing agent on the line, verify the implementation:
 - Publish exactly one unmuted audio track. If video is enabled, its camera
   track must come from the same participant that publishes audio.
 
-`chert guide agent` and the package's
-`examples/student-agent/greet.mjs` document the runtime hook. Existing Builder
-greeting timing has not been verified; a prompt instruction alone is not a
-verified metadata-event hook. Do not claim this requirement is implemented.
+`my-agent/src/chert_bridge.py` implements the bridge-ready hook. Five local tests
+cover greeting timing, repeated signals, early signals, disconnects, and
+cancellation. Existing Builder production code has not yet received this hook.
 Ask before deploying changes or placing a call, and keep audio/video unverified
 until the owner confirms an actual call. Hosting, inference/model sessions,
 and connected providers can incur usage charges.
@@ -147,13 +145,22 @@ policy to append to the hosted agent's existing instructions. It contains only
 a secret reference, never the API key. This is a configuration checklist; the
 local wrapper does not load it into the hosted agent automatically.
 
-Hosted configuration remains pending: add the supplied key as LiveKit secret
-`KEENABLE_API_KEY`, configure MCP server `keenable` at
-`https://api.keenable.ai/mcp` with header
-`X-API-Key: {{secrets.KEENABLE_API_KEY}}`, append the search policy, and deploy
-the updated agent. Do not overwrite existing instructions, voice, or other tools.
-Only claim hosted search is operational after the agent discovers these tools
-and a hosted session successfully uses them.
+Actual MCP integration is in `my-agent/src/agent.py`, using secret
+`KEENABLE_API_KEY`. The agent's own SDK authenticated and discovered both tools.
+A synthetic-audio debugger conversation called search and fetch, then spoke an
+answer grounded in Keenable's official site. Audio regression scenarios are in
+`my-agent/scenarios.yaml`; GPT-Live does not support text-only response testing.
+Production deployment and real FaceTime testing remain pending. The root wrapper
+does not automatically upload this code or modify the hosted agent.
+
+`my-agent/verification.json` records the local checks and synthetic-audio evidence.
+The audio scenario grader reported one of two failed for answer ordering; review
+of the exported timestamps shows search and fetch results preceded the factual
+answer in both scenarios. That evaluator discrepancy is retained, not hidden.
+
+Root `health` marks unconfigured SDK FaceTime credentials as optional. CLI login
+already authorizes the inbound `chert dev` route; missing SDK tokens do not mean
+that CLI login failed. Direct FaceTime API calls use a separate project key.
 
 Source: [Chert setup guide](https://trychert.com/setup).
 LiveKit references: [Agent Builder](https://docs.livekit.io/agents/start/builder/),

@@ -1,16 +1,25 @@
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
-import { mkdtempSync, cpSync, chmodSync, rmSync } from 'node:fs';
+import { mkdtempSync, cpSync, chmodSync, rmSync, writeFileSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 
-const script = resolve('chert-agent.mjs');
+// Tests must never load or copy the owner's actual credentials.
+const fixture = mkdtempSync(resolve(tmpdir(), 'chert-agent-tests-'));
+for (const name of ['chert-agent.mjs', 'chert-contract.mjs', 'chert-agent.config.json']) {
+  cpSync(resolve(name), resolve(fixture, name));
+}
+writeFileSync(resolve(fixture, '.env.local'), '', { mode: 0o600 });
+symlinkSync(resolve('node_modules'), resolve(fixture, 'node_modules'), 'dir');
+after(() => rmSync(fixture, { recursive: true, force: true }));
+const script = resolve(fixture, 'chert-agent.mjs');
 function run(...args) {
   const result = spawnSync(process.execPath, [script, ...args], {
     encoding: 'utf8', env: { PATH: process.env.PATH }, timeout: 3000,
   });
-  return { ...result, record: (() => { try { return JSON.parse(result.stdout.trim()); } catch { return null; } })() };
+  const records = result.stdout.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+  return { ...result, records, record: records.length === 1 ? records[0] : null };
 }
 
 test('outbound call fails closed without claiming success', () => {
@@ -45,12 +54,21 @@ test('stop without connector does not claim release', () => {
 test('private environment file with public permissions is rejected', () => {
   const directory = mkdtempSync(resolve(tmpdir(), 'chert-permissions-'));
   try {
-    for (const name of ['chert-agent.mjs', 'chert-contract.mjs', 'chert-agent.config.json', '.env.local']) cpSync(resolve(name), resolve(directory, name));
+    for (const name of ['chert-agent.mjs', 'chert-contract.mjs', 'chert-agent.config.json']) cpSync(resolve(name), resolve(directory, name));
+    writeFileSync(resolve(directory, '.env.local'), '', { mode: 0o600 });
     chmodSync(resolve(directory, '.env.local'), 0o644);
     const result = spawnSync(process.execPath, [resolve(directory, 'chert-agent.mjs'), 'setup'], { encoding: 'utf8' });
     assert.equal(JSON.parse(result.stdout).state, 'private_env_permissions_required');
     assert.equal(result.status, 1);
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('health marks optional SDK credentials unconfigured without mixing them with CLI login', () => {
+  const result = run('health');
+  const checks = result.records.filter(record => record.check?.startsWith('chert-sdk facetime'));
+  assert.equal(checks.length, 3);
+  assert.ok(checks.every(record => record.state === 'capability_unconfigured'));
+  assert.ok(checks.every(record => record.required_for_inbound_connector === false));
 });
 
 test('published dev codes distinguish retained cleanup from confirmed release', async () => {

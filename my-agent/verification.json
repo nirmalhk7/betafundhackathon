@@ -1,0 +1,42 @@
+{
+  "production_deployment": "pending_owner_approval",
+  "model": "openai/gpt-live-1",
+  "voice": "marin",
+  "unit_tests": {
+    "wrapper_passed": 13,
+    "bridge_greeting_passed": 5
+  },
+  "synthetic_audio_debugger": {
+    "search_and_fetch_called": true,
+    "spoken_answer_received": true
+  },
+  "audio_regression": {
+    "run_id": "SR_vDJCAaZaC5Ur",
+    "automated_grader": {
+      "passed": 1,
+      "failed": 1
+    },
+    "timestamp_review": [
+      {
+        "job_id": "SRJ_YiPWbLkN7gYh",
+        "successful_tool_completion": {
+          "search_web_pages": "2026-10-23T19:41:18.192870912Z",
+          "fetch_page_content": "2026-10-23T19:41:27.376192Z"
+        },
+        "first_substantive_answer_at": "2026-10-23T19:41:32.763301888Z",
+        "tool_results_preceded_answer": true
+      },
+      {
+        "job_id": "SRJ_dxPdoiqVunKu",
+        "successful_tool_completion": {
+          "search_web_pages": "2026-10-23T19:42:22.680591104Z",
+          "fetch_page_content": "2026-10-23T19:42:28.458713088Z"
+        },
+        "first_substantive_answer_at": "2026-10-23T19:42:32.228751104Z",
+        "tool_results_preceded_answer": true
+      }
+    ],
+    "limitation": "Automated grader flagged release-answer ordering; recorded tool and answer timestamps contradict that verdict."
+  },
+  "real_facetime_media_verified": false
+}
