@@ -1,1 +1,1 @@
-# betafundhackathon
+# Project for the Beta Fund Hackathon
