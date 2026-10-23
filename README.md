@@ -1,56 +1,29 @@
 # Local Chert integration
 
-## Active Matt deployment
-
-The active LiveKit target is **Matt**, project `p_59z2r1lar8z`, URL
-`wss://matt-zwtabyku.livekit.cloud`, agent `CA_37DgPSCwJnaM`, dispatch
-`assistant-0c8`, production version `QBKnavmzaKqW`.
-
-Voice now uses Deepgram Nova 3 speech recognition, OpenAI GPT-5.6 Luna reasoning,
-and Cartesia Sonic 3 with Ariana voice `ec1e269e-9ca0-402f-8a18-58e0e022355a`.
-Silero provides voice activity detection. Keenable tools, Chert readiness greeting,
-and computer video remain enabled. LiveKit credentials stay in ignored `.env.local`.
-
-Verified: Ariana synthesis (3.59 seconds, PCM peak 12400); synthetic spoken greeting
-and remembered caller name across turns; Keenable search/fetch with spoken answer;
-cloud Chert-style greeting (PCM peak 22269) and 480x480 computer video. Six Python
-tests, thirteen wrapper tests, and Ruff passed. Temporary test rooms were deleted.
-The RTC SDK emitted a destructor assertion during local probe cleanup after room
-deletion; the probe completed with exit status zero.
-
-An existing terminal Chert connector owns the line and has connected a real call
-in Matt. Do not start a competing connector. Real FaceTime conversation remains
-unverified: observed caller audio still contained digital silence after migration.
-The older Chris quota diagnostics below are historical; they do not describe
-Matt's current inference access.
-
-
 Installed packages: `@trychert/facetime@0.1.0-beta.10` and `@trychert/sdk@0.1.0`.
 Requires Node.js 22.12+ (22.x), 24.x, or 26.x. Dependencies are pinned in `package-lock.json`.
 Restore with `npm ci --ignore-scripts`.
 
-This integration targets the replacement LiveKit Cloud code agent in project **Chris**:
+This integration targets the existing LiveKit Cloud agent in project **Chris**:
 
 - Project: `p_3gx7ofwhqg6`
-- Agent: `CA_GzE9RWgmRVwF` (original Builder deployment deleted with owner approval)
+- Agent: `CA_HJ6N6GNSyzsp`; builder: `ab_qrffng10k9f`
 - Dispatch name: `assistant-0c8`
 - URL: `wss://chris-1zd6fz6o.livekit.cloud`
-- [Agent dashboard](https://cloud.livekit.io/projects/p_3gx7ofwhqg6/agents/CA_GzE9RWgmRVwF)
+- [Agent Builder](https://cloud.livekit.io/projects/p_3gx7ofwhqg6/agents/builder/ab_qrffng10k9f?tab=conversation&dashboardAgentId=CA_HJ6N6GNSyzsp)
 
-The replacement source, revised for Chert greeting timing and Keenable search,
-is deployed from [my-agent](my-agent/README.md). Production reports `Running`,
-version `fjsyshk5G67F`. Our connector reached `agent_warm` and was later
-displaced by another session. A real call connected, but speech is unverified:
-the bridge audio measured digital silence before and after reported unmute.
-It preserves model
-`openai/gpt-live-1`, Marin voice, original instructions, and audio enhancement.
-Model access uses LiveKit Inference; no separate OpenAI API key is required.
+These non-secret identifiers were verified in the dashboard. Deployment showed
+`DEPLOYING` during inspection on October 23, 2026; production readiness has not
+been confirmed. Voice, models, instructions, and tools remain managed by the
+existing Cloud agent. No local voice agent or OpenAI key is required by this
+wrapper in Cloud mode. Any required model credentials belong in the agent's
+existing Cloud configuration.
 
 Incoming FaceTime calls are bridged by Chert into LiveKit rooms, where Chert
-dispatches the named Cloud agent. The agent's dashboard ID is
-reference metadata; dispatch uses its name. The pinned CLI targets
-the production deployment. Project selection, CLI login, line assignment, and
-LiveKit credentials have been verified. Real call media remains unverified.
+dispatches the named Cloud agent. The agent's dashboard ID and builder ID are
+reference metadata; dispatch uses its name, not either ID. The pinned CLI targets
+the production deployment. Chert project/line selection, credentials, and real
+message/call verification remain pending.
 
 ## Finish configuration
 
@@ -84,12 +57,12 @@ The requested native CLI setup command for the selected existing project is:
 ./node_modules/.bin/chert doctor --env-file .env.local --project f023544a-0950-4373-862c-b044b3a34dec --json
 ```
 
-Chert setup and approved CLI login select project
-`f023544a-0950-4373-862c-b044b3a34dec`. LiveKit credentials passed doctor. Austin
-Parker is assigned. The latest read-only check now reports calls enabled, a
-recent Mac heartbeat. The approved replacement connector reached `agent_warm` but was later displaced.
-Another connector now owns an active call; do not start duplicate connectors,
-take over its line, or reset onboarding automatically.
+Chert setup defaults now select project `f023544a-0950-4373-862c-b044b3a34dec`.
+LiveKit credentials previously passed doctor. Existing CLI sign-in belongs to the
+old project; approve a fresh `chert login` selecting this new existing project.
+Do not create another project, run onboarding, or reset its state. Line assignment
+and agent readiness for the new project remain unchecked pending sign-in.
+No agent/connector is running from this setup yet.
 
 ## Required Chert greeting behavior
 
@@ -102,9 +75,10 @@ Before starting this existing agent on the line, verify the implementation:
 - Publish exactly one unmuted audio track. If video is enabled, its camera
   track must come from the same participant that publishes audio.
 
-`my-agent/src/chert_bridge.py` implements the bridge-ready hook. Five local tests
-cover greeting timing, repeated signals, early signals, disconnects, and
-cancellation. Existing Builder production code has not yet received this hook.
+`chert guide agent` and the package's
+`examples/student-agent/greet.mjs` document the runtime hook. Existing Builder
+greeting timing has not been verified; a prompt instruction alone is not a
+verified metadata-event hook. Do not claim this requirement is implemented.
 Ask before deploying changes or placing a call, and keep audio/video unverified
 until the owner confirms an actual call. Hosting, inference/model sessions,
 and connected providers can incur usage charges.
@@ -168,52 +142,19 @@ The Keenable endpoint authenticated successfully and exposed `search_web_pages`
 and `fetch_page_content`. The mistakenly created Claude MCP registration was
 removed; this agent must use LiveKit's own MCP tools.
 
-`livekit-keenable.json` records the MCP endpoint, tool names, and policy. It
-contains only a secret reference, never the API key. Actual code and separate
-voice/backend instructions are maintained in `my-agent/src/agent.py`.
+`livekit-keenable.json` contains the prepared Builder settings and exact search
+policy to append to the hosted agent's existing instructions. It contains only
+a secret reference, never the API key. This is a configuration checklist; the
+local wrapper does not load it into the hosted agent automatically.
 
-Actual MCP integration is in `my-agent/src/agent.py`, using secret
-`KEENABLE_API_KEY`. The agent's own SDK authenticated and discovered both tools.
-A synthetic-audio debugger conversation called search and fetch, then spoke an
-answer grounded in Keenable's official site. Audio regression scenarios are in
-`my-agent/scenarios.yaml`; GPT-Live does not support text-only response testing.
-Production code has been deployed; real FaceTime testing remains pending. The root wrapper
-does not automatically upload this code or modify the hosted agent.
-
-`my-agent/verification.json` records the local checks and synthetic-audio evidence.
-The audio scenario grader reported one of two failed for answer ordering; review
-of the exported timestamps shows search and fetch results preceded the factual
-answer in both scenarios. That evaluator discrepancy is retained, not hidden.
-
-Root `health` marks unconfigured SDK FaceTime credentials as optional. CLI login
-already authorizes the inbound `chert dev` route; missing SDK tokens do not mean
-that CLI login failed. Direct FaceTime API calls use a separate project key.
+Hosted configuration remains pending: add the supplied key as LiveKit secret
+`KEENABLE_API_KEY`, configure MCP server `keenable` at
+`https://api.keenable.ai/mcp` with header
+`X-API-Key: {{secrets.KEENABLE_API_KEY}}`, append the search policy, and deploy
+the updated agent. Do not overwrite existing instructions, voice, or other tools.
+Only claim hosted search is operational after the agent discovers these tools
+and a hosted session successfully uses them.
 
 Source: [Chert setup guide](https://trychert.com/setup).
 LiveKit references: [Agent Builder](https://docs.livekit.io/agents/start/builder/),
 [dispatch names and production deployment](https://docs.livekit.io/agents/server/agent-dispatch/).
-
-Browser verification update: Brave's Billing page says **"Credit balances are temporarily unavailable."** Sonic 3 shows a concurrency limit of 5 and peak usage of 1. A fresh gateway request still returns HTTP 429 with `MaxGatewayCredits`, `max_allowed: "0"`, and `remaining_limit: "0"`. This establishes inference denial, but does not establish that the user consumed all credits or must upgrade. Treat prior upgrade guidance as the gateway's generic hint, not a verified remedy. Screenshots and sanitized response are in `output/livekit-inference-evidence.json` at the repository root.
-
-## Current voice blocker (2026-10-23)
-
-LiveKit Inference currently rejects GPT-Live with HTTP 429,
-`inference_quota_exceeded` (`MaxGatewayCredits`, `sts`), reporting realtime
-limit and remaining quota both `0` on the free tier. Restore realtime inference
-quota in LiveKit project **Chris** before retesting voice. Chert's recent calls
-reached worker `bridge_ready` and `agent_connected`; video/RTC connectivity does
-not establish model availability. No billing or production-code changes were made.
-After restoring quota, verify greeting and both audio directions; earlier caller
-audio samples were silent. Details are in `my-agent/verification.json`.
-
-## Computer picture and calling
-
-Owner-provided Chert number: `+1 628-228-1717` (the dashboard masks its identity).
-The deployed agent publishes `my-agent/assets/computer.png` as its camera track
-for Chert calls. Start a fresh FaceTime Video call to receive the new deployment.
-FaceTime Audio does not carry this image. Real FaceTime media still needs owner
-confirmation; the previous call delivered silent caller audio to LiveKit.
-
-For a saved contact photo before answer, import [Chert Computer](output/Chert%20Computer.vcf)
-on your phone. The card embeds the provided number and computer image; it does
-not change the shared Chert line's Apple account profile.

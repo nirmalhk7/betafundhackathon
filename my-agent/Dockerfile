@@ -59,6 +59,12 @@ COPY . .
 # Build tools (gcc, g++, python3-dev) are not included in the final image
 FROM base
 
+# Runtime libraries for MediaPipe's OpenCV dependency (camera body-language tracking)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+  && rm -rf /var/lib/apt/lists/*
+
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/build/building/best-practices/#user
 ARG UID=10001

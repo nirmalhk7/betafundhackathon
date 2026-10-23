@@ -1,46 +1,56 @@
 # LiveKit Agent
 
-## Active Matt deployment
+## Practice coach
 
-The active LiveKit target is **Matt**, project `p_59z2r1lar8z`, URL
-`wss://matt-zwtabyku.livekit.cloud`, agent `CA_37DgPSCwJnaM`, dispatch
-`assistant-0c8`, production version `QBKnavmzaKqW`.
+The agent is a FaceTime practice coach for pitches, job interviews, and
+presentations. Its persona lives in `src/coach.py`: it asks what the caller is
+rehearsing, researches the topic with Keenable (one search, at most one fetch),
+listens without interrupting, and after "I'm done" gives three strengths, three
+improvements, and one improved line. `gpt-live-1` is audio-only, so body language comes from `src/vision.py`: it
+subscribes to the caller's camera, runs MediaPipe face and gesture models
+(`models/*.task`) locally on about five frames per second, and the coach reads a
+plain-English summary (eye contact, expression, head movement, hand gestures)
+through the `get_body_language` tool right before feedback. Audio-only calls
+skip body language. Try the tracker on your webcam without LiveKit:
 
-Voice now uses Deepgram Nova 3 speech recognition, OpenAI GPT-5.6 Luna reasoning,
-and Cartesia Sonic 3 with Ariana voice `ec1e269e-9ca0-402f-8a18-58e0e022355a`.
-Silero provides voice activity detection. Keenable tools, Chert readiness greeting,
-and computer video remain enabled. LiveKit credentials stay in ignored `.env.local`.
+```sh
+uv run --python 3.13 python scripts/vision_check.py --seconds 20
+```
 
-Verified: Ariana synthesis (3.59 seconds, PCM peak 12400); synthetic spoken greeting
-and remembered caller name across turns; Keenable search/fetch with spoken answer;
-cloud Chert-style greeting (PCM peak 22269) and 480x480 computer video. Six Python
-tests, thirteen wrapper tests, and Ruff passed. Temporary test rooms were deleted.
-The RTC SDK emitted a destructor assertion during local probe cleanup after room
-deletion; the probe completed with exit status zero.
+### Avatar
 
-An existing terminal Chert connector owns the line and has connected a real call
-in Matt. Do not start a competing connector. Real FaceTime conversation remains
-unverified: observed caller audio still contained digital silence after migration.
-The older Chris quota diagnostics below are historical; they do not describe
-Matt's current inference access.
+Set `SIMLI_API_KEY` and `SIMLI_FACE_ID` in `.env.local` to give the coach a
+face: a Simli avatar joins once a caller arrives and publishes the coach's voice
+and lip-synced video as one participant, which is what Chert expects. Leave
+them blank for a voice-only coach; if Simli fails to start, the coach falls back
+to voice. The avatar's idle limit is raised to ten minutes so it stays while the
+caller practices.
 
+### Running your own copy locally
+
+- Set `AGENT_NAME` in `.env.local` to a unique dispatch name (for example
+  `coach-<you>`) so your local worker does not share `assistant-0c8` with the
+  deployed agent. Blank keeps the production name.
+- Use Python 3.13: `uv sync --frozen --python 3.13`. Python 3.15 fails because
+  `livekit-blingfire` ships no wheel for it.
+- `lk` does not read `.env.local`; load it into the shell first:
+
+```sh
+set -a && . ./.env.local && set +a
+lk agent debugger start --audio
+lk agent debugger say "A pitch for Keenable to seed investors."
+lk agent debugger stop
+```
 
 ## Chert integration in this project
 
 This is the exported source of your existing Builder agent, not a generic new
 persona. It retains dispatch name `assistant-0c8`, model `openai/gpt-live-1`,
-Marin voice, original instructions, and AI-coustics audio enhancement.
-`livekit.toml` targets code deployment `CA_GzE9RWgmRVwF` in LiveKit project Chris.
-The original Builder deployment was deleted with owner approval to free the one-agent quota.
+Marin voice, and AI-coustics audio enhancement; the original assistant
+instructions were replaced by the practice coach above.
+`livekit.toml` targets existing agent `CA_HJ6N6GNSyzsp` in LiveKit project Chris.
 
 Changes added here:
-
-- A computer picture is prepared as a continuously published video track from
-  the voice participant. Verified in a temporary LiveKit room; deployed with owner approval; a production agent delivered the picture
-  to a LiveKit subscriber. A fresh FaceTime call still needs owner verification.
-  It needs a fresh inbound FaceTime Video call after approved deployment.
-  The current line API reports video disabled even though this active call
-  record requested video; Chert must confirm line support.
 
 - Chert rooms join promptly and wait for a caller before creating the paid model session.
 - Greeting waits for room metadata `chert_bridge_ready: true`; participant join
@@ -49,24 +59,6 @@ Changes added here:
 - Keenable MCP provides `search_web_pages` and `fetch_page_content`. Voice
   instructions delegate uncertain/current facts; backend instructions require
   source verification and honest failure reporting.
-
-Browser verification update: Brave's Billing page says **"Credit balances are temporarily unavailable."** Sonic 3 shows a concurrency limit of 5 and peak usage of 1. A fresh gateway request still returns HTTP 429 with `MaxGatewayCredits`, `max_allowed: "0"`, and `remaining_limit: "0"`. This establishes inference denial, but does not establish that the user consumed all credits or must upgrade. Treat prior upgrade guidance as the gateway's generic hint, not a verified remedy. Screenshots and sanitized response are in `output/livekit-inference-evidence.json` at the repository root.
-
-Current voice blocker (2026-10-23): a direct LiveKit Inference GPT-Live
-WebSocket request returned HTTP 429, `inference_quota_exceeded`, category
-`MaxGatewayCredits`, quota type `sts`. The project reported `max_allowed: "0"`,
-`remaining_limit: "0"`, and `free_tier: true`. The provider's hint says realtime
-credits are exhausted and to wait for the next billing cycle or upgrade the plan.
-Restore realtime inference quota in **Chris** (`p_3gx7ofwhqg6`) before further
-voice tests. An RTC agent and its computer video can connect while inference is
-unavailable; neither proves the voice model is running.
-
-Three recent real calls had worker `bridge_ready` and `agent_connected` events.
-Earlier samples of caller audio were digital silence, and an isolated production
-greeting logged `the model did not start speaking when asked`. After quota is
-restored, verify greeting audio, caller audio, and a two-way conversation before
-marking this resolved. No production code or billing settings changed during
-this investigation. The existing connector remains responsible for the line.
 
 Model usage is billed through LiveKit Inference using LiveKit credentials;
 this configuration does not require a separate `OPENAI_API_KEY`. GPT-Live is
@@ -89,15 +81,15 @@ uv run ruff check src tests
 
 ### Deployment and calling
 
-The owner approved replacing the Builder deployment with this code deployment.
-Future production updates still require approval. Update this deployment:
+Production deployment requires owner approval. Use the existing agent ID; do
+not create a competing deployment with the same dispatch name:
 
 ```sh
-lk agent deploy --id CA_GzE9RWgmRVwF --secrets-file .env.keenable
+lk agent deploy --id CA_HJ6N6GNSyzsp --secrets-file .env.keenable
 ```
 
-Maintain this exported project as the source of truth; avoid creating a competing
-Builder agent with the same dispatch name.
+After moving production to this source, further Builder deployments can overwrite
+the custom Chert greeting hook. Maintain this exported project as the source of truth.
 
 The Chert connector separately uses pinned `@trychert/facetime@0.1.0-beta.10`,
 approved CLI login, project `f023544a-0950-4373-862c-b044b3a34dec`, and the same
