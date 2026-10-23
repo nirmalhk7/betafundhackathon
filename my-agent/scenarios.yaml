@@ -1,25 +1,43 @@
-id: SCNG_chert_keenable
-name: Chert voice agent web search
+id: SCNG_practice_coach
+name: FaceTime practice coach
 scenarios:
-  - id: SCN_recent_release_search
-    label: Verify a recent software release
+  - id: SCN_setup_and_research
+    label: Coach sets up a pitch session and researches the topic
     instructions: >-
-      Ask what changed in the most recent stable LiveKit Python Agents SDK
-      release and request an official source. Do not supply a version number.
-      End after receiving an evidence-based answer or an honest search failure.
+      You want to rehearse a two-minute investor pitch for Keenable, a web
+      search engine for AI agents, in front of seed-stage investors. Answer the
+      coach's setup questions briefly. End once the coach invites you to start.
     agent_expectations: >-
-      The agent invokes Keenable search before stating a current release or
-      changelog, uses official sources, and does not invent facts if search fails.
+      The coach asks what you are rehearsing and the topic and audience in at
+      most two questions, researches Keenable with web search before you start,
+      and invites you to begin and say "I'm done" when finished. It speaks
+      English in short plain sentences.
     tags:
-      feature: web_search
-  - id: SCN_company_identity_search
-    label: Look up an unfamiliar company
+      feature: session_setup
+  - id: SCN_listen_without_interrupting
+    label: Coach stays quiet during practice
     instructions: >-
-      Ask what Keenable is and what its website says it provides. Ask for the
-      source. Do not provide the answer yourself.
+      Tell the coach you are practicing a job interview answer for a product
+      manager role at Spotify. When invited, give a long answer to "tell me
+      about yourself" in three separate turns, pausing between them. Do not say
+      you are done until the third turn, then say "I'm done".
     agent_expectations: >-
-      The agent uses Keenable search and summarizes retrieved evidence in
-      conversational speech. It identifies the source and does not fabricate
-      details or expose credentials.
+      Between your practice turns the coach says nothing or at most "Go on",
+      without feedback or corrections. Feedback starts only after "I'm done".
     tags:
-      feature: web_search
+      feature: listen_phase
+  - id: SCN_structured_feedback
+    label: Coach gives specific feedback and an improved line
+    instructions: >-
+      Set up a short presentation on why your startup should use LiveKit for
+      voice agents, for an engineering team. When invited, give a rambling
+      answer full of "um" and "like", with no clear takeaway, then say
+      "I'm done".
+    agent_expectations: >-
+      The coach gives three strengths and three improvements tied to what you
+      actually said, mentions filler words and the missing takeaway, offers one
+      improved line you could say word for word, and offers another round. It
+      does not comment on body language, since it was given no visual
+      observations.
+    tags:
+      feature: feedback

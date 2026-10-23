@@ -1,10 +1,36 @@
 # LiveKit Agent
 
+## Practice coach
+
+The agent is a FaceTime practice coach for pitches, job interviews, and
+presentations. Its persona lives in `src/coach.py`: it asks what the caller is
+rehearsing, researches the topic with Keenable (one search, at most one fetch),
+listens without interrupting, and after "I'm done" gives three strengths, three
+improvements, and one improved line. It comments on body language only when
+visual observations are supplied; `gpt-live-1` itself is audio-only.
+
+### Running your own copy locally
+
+- Set `AGENT_NAME` in `.env.local` to a unique dispatch name (for example
+  `coach-<you>`) so your local worker does not share `assistant-0c8` with the
+  deployed agent. Blank keeps the production name.
+- Use Python 3.13: `uv sync --frozen --python 3.13`. Python 3.15 fails because
+  `livekit-blingfire` ships no wheel for it.
+- `lk` does not read `.env.local`; load it into the shell first:
+
+```sh
+set -a && . ./.env.local && set +a
+lk agent debugger start --audio
+lk agent debugger say "A pitch for Keenable to seed investors."
+lk agent debugger stop
+```
+
 ## Chert integration in this project
 
 This is the exported source of your existing Builder agent, not a generic new
 persona. It retains dispatch name `assistant-0c8`, model `openai/gpt-live-1`,
-Marin voice, original instructions, and AI-coustics audio enhancement.
+Marin voice, and AI-coustics audio enhancement; the original assistant
+instructions were replaced by the practice coach above.
 `livekit.toml` targets existing agent `CA_HJ6N6GNSyzsp` in LiveKit project Chris.
 
 Changes added here:
