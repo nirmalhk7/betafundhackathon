@@ -28,7 +28,7 @@ message/call verification remain pending.
 ## Finish configuration
 
 1. Open `.env.local` in your local editor. Enter your **Chert** project UUID as
-   `CHERT_PROJECT_ID` (selected: `07ce24ed-f522-483c-93e2-106a7de27e3d`), plus `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` for the
+   `CHERT_PROJECT_ID` (selected: `f023544a-0950-4373-862c-b044b3a34dec`), plus `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET` for the
    **Chris** LiveKit project above. Chert's project ID is separate from LiveKit's
    `p_3gx7ofwhqg6`; do not substitute one for the other. `LIVEKIT_URL` and
    `AGENT_NAME` default to the pinned Cloud target, so they can remain blank.
@@ -53,14 +53,16 @@ message/call verification remain pending.
 The requested native CLI setup command for the selected existing project is:
 
 ```sh
-./node_modules/.bin/chert setup --env-file .env.local --project 07ce24ed-f522-483c-93e2-106a7de27e3d
-./node_modules/.bin/chert doctor --env-file .env.local --project 07ce24ed-f522-483c-93e2-106a7de27e3d --json
+./node_modules/.bin/chert setup --env-file .env.local --project f023544a-0950-4373-862c-b044b3a34dec
+./node_modules/.bin/chert doctor --env-file .env.local --project f023544a-0950-4373-862c-b044b3a34dec --json
 ```
 
-CLI `whoami` currently reports no local sign-in. Reuse the existing account via
-`chert login`; do not create another project, run onboarding, or reset its state.
-Setup currently stops with `livekit_credentials_missing`; enter keys privately
-before retrying. No agent/connector is running from this setup yet.
+Chert setup defaults now select project `f023544a-0950-4373-862c-b044b3a34dec`.
+LiveKit credentials previously passed doctor. Existing CLI sign-in belongs to the
+old project; approve a fresh `chert login` selecting this new existing project.
+Do not create another project, run onboarding, or reset its state. Line assignment
+and agent readiness for the new project remain unchecked pending sign-in.
+No agent/connector is running from this setup yet.
 
 ## Required Chert greeting behavior
 

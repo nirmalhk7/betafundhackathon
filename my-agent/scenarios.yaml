@@ -1,0 +1,25 @@
+id: SCNG_chert_keenable
+name: Chert voice agent web search
+scenarios:
+  - id: SCN_recent_release_search
+    label: Verify a recent software release
+    instructions: >-
+      Ask what changed in the most recent stable LiveKit Python Agents SDK
+      release and request an official source. Do not supply a version number.
+      End after receiving an evidence-based answer or an honest search failure.
+    agent_expectations: >-
+      The agent invokes Keenable search before stating a current release or
+      changelog, uses official sources, and does not invent facts if search fails.
+    tags:
+      feature: web_search
+  - id: SCN_company_identity_search
+    label: Look up an unfamiliar company
+    instructions: >-
+      Ask what Keenable is and what its website says it provides. Ask for the
+      source. Do not provide the answer yourself.
+    agent_expectations: >-
+      The agent uses Keenable search and summarizes retrieved evidence in
+      conversational speech. It identifies the source and does not fabricate
+      details or expose credentials.
+    tags:
+      feature: web_search
