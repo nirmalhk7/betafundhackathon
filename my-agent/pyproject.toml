@@ -9,7 +9,7 @@ description = "Single prompt voice AI agent built with LiveKit Agents for Python
 requires-python = ">=3.10"
 
 dependencies = [
-    "livekit-agents[mcp]>=1.8.8,<2",
+    "livekit-agents[mcp,simli]>=1.8.8,<2",
     "livekit-plugins-ai-coustics~=0.2",
     "livekit-plugins-noise-cancellation~=0.2",
     "mediapipe>=1.1.1",

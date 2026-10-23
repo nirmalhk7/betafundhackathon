@@ -337,7 +337,10 @@ class VisionTracker:
         return text
 
     def _wanted(self, participant: rtc.RemoteParticipant) -> bool:
-        return self._identity is None or participant.identity == self._identity
+        if self._identity is not None:
+            return participant.identity == self._identity
+        # Never watch the coach's own avatar.
+        return participant.kind != rtc.ParticipantKind.PARTICIPANT_KIND_AGENT
 
     def _on_published(
         self, pub: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant

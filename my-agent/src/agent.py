@@ -19,6 +19,7 @@ from livekit.agents import (
 )
 from livekit.plugins import (
     ai_coustics,
+    simli,
 )
 
 from chert_bridge import greet_on_bridge_ready
@@ -111,6 +112,25 @@ class CoachAgent(Agent):
             )
 
 
+def simli_avatar() -> simli.AvatarSession | None:
+    """Optional face for the coach; unset SIMLI_* keeps the call voice-only."""
+    key = os.environ.get("SIMLI_API_KEY", "").strip()
+    face = os.environ.get("SIMLI_FACE_ID", "").strip()
+    if not key or not face:
+        return None
+    return simli.AvatarSession(
+        simli_config=simli.SimliConfig(
+            api_key=key,
+            face_id=face,
+            # The coach stays silent while the caller practices; the default
+            # 30 s idle limit would drop the avatar mid-pitch.
+            max_idle_time=600,
+            max_session_length=1800,
+        ),
+        avatar_participant_name="Coach",
+    )
+
+
 async def wait_for_microphone(
     room: rtc.Room, participant: rtc.RemoteParticipant, timeout: float = 30
 ) -> None:
@@ -171,6 +191,16 @@ async def entrypoint(ctx: JobContext):
         ),
     )
     ctx.add_shutdown_callback(session.aclose)
+
+    # Start the avatar only once a caller is here, so warm rooms cost nothing.
+    # Simli publishes the coach's voice and face as one participant, which is
+    # what Chert expects; if it fails to start, the coach falls back to voice.
+    avatar = None if ctx.is_fake_job() else simli_avatar()
+    if avatar:
+        try:
+            await avatar.start(session, room=ctx.room)
+        except Exception:
+            logger.exception("avatar failed to start; continuing voice-only")
 
     await session.start(
         agent=CoachAgent([tools], vision=vision, greet_on_entry=not chert_call),

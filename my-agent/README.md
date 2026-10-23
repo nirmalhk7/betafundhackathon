@@ -17,6 +17,15 @@ skip body language. Try the tracker on your webcam without LiveKit:
 uv run --python 3.13 python scripts/vision_check.py --seconds 20
 ```
 
+### Avatar
+
+Set `SIMLI_API_KEY` and `SIMLI_FACE_ID` in `.env.local` to give the coach a
+face: a Simli avatar joins once a caller arrives and publishes the coach's voice
+and lip-synced video as one participant, which is what Chert expects. Leave
+them blank for a voice-only coach; if Simli fails to start, the coach falls back
+to voice. The avatar's idle limit is raised to ten minutes so it stays while the
+caller practices.
+
 ### Running your own copy locally
 
 - Set `AGENT_NAME` in `.env.local` to a unique dispatch name (for example

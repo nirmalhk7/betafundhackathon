@@ -135,3 +135,21 @@ def test_hands_rarely_in_view_suggests_framing():
     text = report(frames).summary()
     assert "in view only 30 percent" in text
     assert "mostly still" not in text
+
+
+def test_tracker_ignores_agent_participants_like_the_avatar():
+    from types import SimpleNamespace
+
+    from livekit import rtc
+
+    from vision import VisionTracker
+
+    tracker = VisionTracker(room=SimpleNamespace())
+    caller = SimpleNamespace(
+        identity="diego", kind=rtc.ParticipantKind.PARTICIPANT_KIND_STANDARD
+    )
+    avatar = SimpleNamespace(
+        identity="simli-avatar-agent", kind=rtc.ParticipantKind.PARTICIPANT_KIND_AGENT
+    )
+    assert tracker._wanted(caller)
+    assert not tracker._wanted(avatar)
