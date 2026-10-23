@@ -1,0 +1,33 @@
+{
+  "checked_at_utc": "2026-10-23T21:43:00.156107+00:00",
+  "project_id": "p_3gx7ofwhqg6",
+  "browser": "Brave",
+  "dashboard": {
+    "billing_url": "https://cloud.livekit.io/projects/p_3gx7ofwhqg6/settings/billing",
+    "plan": "Build",
+    "credit_balance_status": "Credit balances are temporarily unavailable.",
+    "gpt_live_included_usage_minutes": 1,
+    "total_usd": "0.00",
+    "sonic_3_concurrency_limit": 5,
+    "sonic_3_peak_concurrency": 1
+  },
+  "gateway": {
+    "voice_id": "ec1e269e-9ca0-402f-8a18-58e0e022355a",
+    "model": "cartesia/sonic-3",
+    "http_status": 429,
+    "type": "inference_quota_exceeded",
+    "hint": "TTS credit quota exhausted. Wait for the next billing cycle or upgrade your plan.",
+    "quota_type": "tts",
+    "category": "MaxGatewayCredits",
+    "remaining_limit": "0",
+    "max_allowed": "0",
+    "free_tier": "true",
+    "audible_sample_received": false,
+    "production_changed": false
+  },
+  "conclusion": "LiveKit gateway denies inference with zero credit allowance. Actual remaining credit balance is unverified because dashboard credit balances are unavailable. Exhausted user credits or a required plan upgrade are not established by this evidence.",
+  "screenshots": [
+    "livekit-billing-evidence.jpg",
+    "livekit-quota-evidence.jpg"
+  ]
+}

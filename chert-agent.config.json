@@ -2,11 +2,10 @@
   "mode": "livekit-cloud",
   "runtime": [],
   "livekit": {
-    "projectId": "p_3gx7ofwhqg6",
-    "agentId": "CA_HJ6N6GNSyzsp",
-    "builderId": "ab_qrffng10k9f",
+    "projectId": "p_59z2r1lar8z",
+    "agentId": "CA_37DgPSCwJnaM",
     "agentName": "assistant-0c8",
-    "url": "wss://chris-1zd6fz6o.livekit.cloud",
-    "dashboardUrl": "https://cloud.livekit.io/projects/p_3gx7ofwhqg6/agents/builder/ab_qrffng10k9f?tab=conversation&dashboardAgentId=CA_HJ6N6GNSyzsp"
+    "url": "wss://matt-zwtabyku.livekit.cloud",
+    "dashboardUrl": "https://cloud.livekit.io/projects/p_59z2r1lar8z/agents/CA_37DgPSCwJnaM"
   }
 }

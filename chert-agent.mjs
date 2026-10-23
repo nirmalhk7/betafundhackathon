@@ -75,11 +75,21 @@ async function reads() {
     if (name === 'chert' && !process.env.CHERT_PROJECT_ID) {
       emit('configuration_pending', { check: 'doctor', missing: 'CHERT_PROJECT_ID' }); process.exitCode = 1; continue;
     }
+    if (name === 'chert-sdk' && args[0] === 'facetime') {
+      const missing = ['CHERT_PROJECT_ID', 'CHERT_FACETIME_URL', 'CHERT_FACETIME_TOKEN']
+        .filter(key => !process.env[key]?.trim());
+      if (missing.length) {
+        emit('capability_unconfigured', { check: `chert-sdk ${args.join(' ')}`, missing,
+          required_for_inbound_connector: false, media_verified: false });
+        continue;
+      }
+    }
     const result = await run(name, args);
     if (result.code !== 0) process.exitCode = 1;
     // Exit status is a diagnostic result, never evidence of media or delivery.
     emit('check_result', { check: `${name} ${args.slice(0, name === 'chert' ? 1 : 2).join(' ')}`,
-      exit_code: result.code, media_verified: false, details: 'Use the native CLI privately to inspect project and line identity.' });
+      exit_code: result.code, required_for_inbound_connector: name === 'chert', media_verified: false,
+      details: 'Use the native CLI privately to inspect project and line identity.' });
   }
 }
 async function message() {

@@ -1,0 +1,33 @@
+{
+  "checked_at_utc": "2026-10-23T22:01:20.654296+00:00",
+  "livekit_project_id": "p_59z2r1lar8z",
+  "chert_project_id": "f023544a-0950-4373-862c-b044b3a34dec",
+  "call_id": "d1edfeb5-f23a-4380-8d4a-952cef963470",
+  "worker_id": "7dea2734-6616-43ca-bd93-7e9599af441f",
+  "room": "chert-warm-aAWFTP4F3jBt",
+  "voice": "Cartesia Ariana",
+  "agent_audio_pcm_peak_during_approved_greeting": 18816,
+  "caller_audio_pcm_peak_over_9750_frames": 0,
+  "user_heard_greeting": false,
+  "bridge_can_subscribe": true,
+  "bridge_can_publish": true,
+  "bridge_audio_muted": false,
+  "agent_audio_muted": false,
+  "agent_audio_track_count": 1,
+  "agent_camera_and_audio_same_participant": true,
+  "worker_events": [
+    "answered",
+    "active",
+    "bridge_ready",
+    "agent_connected"
+  ],
+  "worker_media_status": {},
+  "assessment": "Failure narrowed to Chert/FaceTime media path. LiveKit agent emits speech, but FaceTime user hears silence; Chert caller track delivers digital silence. Subscription permission is present; actual bridge subscription/playback and FaceTime capture still need Chert worker inspection.",
+  "requested_operator_checks": [
+    "Confirm Chert bridge subscribes to agent roomio_audio and receives nonzero decoded PCM.",
+    "Verify PCM playback reaches the FaceTime microphone device.",
+    "Verify FaceTime remote audio capture reaches facetime-remote-audio; current stream is digital silence."
+  ],
+  "no_transcript_read": true,
+  "production_code_changed_during_probe": false
+}
